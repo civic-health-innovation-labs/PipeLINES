@@ -1,0 +1,31 @@
+---
+name: PR Checks
+
+on:
+  pull_request:
+jobs:
+  lint:
+    name: Validate
+    runs-on: ubuntu-latest
+    concurrency:
+      group: "${{ github.workflow }}-${{ github.head_ref }}-validate"
+      cancel-in-progress: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: make install-test install-lint
+
+      - name: Pre-commit linting
+        uses: pre-commit/action@v3.0.0
+
+      - name: Run tests
+        run: make test
+
+      - name: Build artifacts
+        run: make artifacts

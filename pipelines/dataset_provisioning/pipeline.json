@@ -1,0 +1,36 @@
+{
+    "name": "DatasetProvisioning",
+    "properties": {
+        "activities": [
+            {
+                "name": "DatasetProvisioning",
+                "type": "DatabricksSparkPython",
+                "typeProperties": {
+                    "pythonFile": "abfss://libraries@STORAGE_ACCOUNT.dfs.core.windows.net/dataset_provisioning/dataset_provisioning.py",
+                    "parameters": [
+                        "--query_base64",
+                        "@pipeline().parameters.query_base64",
+                        "--workspace_uuid",
+                        "@pipeline().parameters.workspace_uuid"
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "parameters": {
+            "query_base64": {
+                "type": "String",
+                "defaultValue": ""
+            },
+            "workspace_uuid": {
+                "type": "String",
+                "defaultValue": ""
+            }
+        },
+        "annotations": []
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

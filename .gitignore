@@ -1,0 +1,19 @@
+# Environmental files and configuration YAML files
+.env
+*.env
+config.yaml
+
+# Metadata for Apple computers
+.DS_store
+
+# Python internal files
+**/__pycache__/**
+**/*egg-info/**
+**/dist/**
+
+# For VS code internal settings
+.vscode/
+
+# Files for PySpark cluters (wheels etc.)
+**/artifacts/**
+devel_*
