@@ -6,7 +6,7 @@
                 "name": "DatasetProvisioning",
                 "type": "DatabricksSparkPython",
                 "typeProperties": {
-                    "pythonFile": "abfss://libraries@STORAGE_ACCOUNT.dfs.core.windows.net/dataset_provisioning/dataset_provisioning.py",
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/dataset_provisioning/dataset_provisioning.py",
                     "parameters": [
                         "--query_base64",
                         "@pipeline().parameters.query_base64",
