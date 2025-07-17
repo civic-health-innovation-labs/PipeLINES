@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rio_pipeline"
+version = "0.0.1"
+dependencies = [
+    "thinc == 8.3.4",
+    "spacy == 3.8.7",
+    "presidio-analyzer == 2.2.358",
+    "presidio-anonymizer == 2.2.358",
+    "en-core-web-lg @ https://mricopennlpimages.blob.core.windows.net/publicnlpimagesmric/en_core_web_lg-3.8.0-py3-none-any.whl",
+]
+
+[project.optional-dependencies]
+build = [
+    "build == 0.10.0",
+]
+test = [
+    "delta-spark == 4.0.0",
+    "opencensus-ext-azure==1.1.15",
+    "opencensus-ext-logging==0.1.1",
+    "pyodbc == 5.2.0",
+    "pyspark == 4.0.0",
+    "pytest == 8.4.1",
+    "pytest-mock == 3.14.1",
+    "pymssql == 2.3.5",
+    "pyspark-test == 0.2.0", 
+    "testcontainers == 4.11.0",
+    "SQLAlchemy == 2.0.41",
+    "thinc == 8.3.4",
+    "spacy == 3.8.7",
+    "presidio-analyzer == 2.2.358",
+    "presidio-anonymizer == 2.2.358",
+    "en-core-web-lg @ https://mricopennlpimages.blob.core.windows.net/publicnlpimagesmric/en_core_web_lg-3.8.0-py3-none-any.whl",
+]
+lint = [
+    "mypy == 1.16.1"
+]
+
+[tool.black]
+line-length = 99
+
+[tool.mypy]
+python_version = "3.10"
+
+[[tool.mypy.overrides]]
+module = "testcontainers.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "opencensus.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pyspark_test.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "synapse.ml.cognitive.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "presidio_analyzer.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "presidio_anonymizer.*"
+ignore_missing_imports = true

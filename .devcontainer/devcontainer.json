@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-    "name": "Data Pipelines",
+    "name": "M-RIC Data Pipelines",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
     "image": "mcr.microsoft.com/devcontainers/python:0-3.10",
 
@@ -49,7 +49,7 @@
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
 
-    "onCreateCommand": "python3 -m pip install -e pipelines/generic_pipeline[build,test,lint]",
+    "onCreateCommand": "python3 -m pip install -e pipelines/rio_pipeline[build,test,lint]",
 
     // "postCreateCommand": "pre-commit install --hook-type pre-push"
 

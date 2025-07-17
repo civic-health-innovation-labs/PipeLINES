@@ -1,0 +1,104 @@
+{
+    "name": "RioPipeline",
+    "properties": {
+        "activities": [
+            {
+                "name": "IngestionActivity",
+                "type": "DatabricksSparkPython",
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/ingestion.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/rio_pipeline-0.0.1-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "PseudonymisationActivity",
+                "type": "DatabricksSparkPython",
+                "dependsOn": [
+                    {
+                        "activity": "IngestionActivity",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "2.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/pseudonymisation.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/rio_pipeline-0.0.1-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "FeatureExtractionActivity",
+                "type": "DatabricksSparkPython",
+                "dependsOn": [
+                    {
+                        "activity": "PseudonymisationActivity",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/feature_extraction.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/rio_pipeline-0.0.1-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "CleaningStepActivity",
+                "type": "DatabricksSparkPython",
+                "dependsOn": [
+                    {
+                        "activity": "FeatureExtractionActivity",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/cleaning_step.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/rio_pipeline/rio_pipeline-0.0.1-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "parameters": {}
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
