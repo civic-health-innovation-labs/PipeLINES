@@ -39,14 +39,9 @@ First, you need to configure a series of environmental variables in the HeifER c
 2. `env-dataset-provisioning.example.env`: Configuration of the dataset provisioning pipeline.
 3. `env-bak-unzip-pipeline-example.env`: Configuration of the unzipping pipeline (that unloads zipped bak file into the Managed SQL Server Instance in Azure).
 4. `env-rio.example.env`: Configuration of the RiO pipeline.
+5. `env-bak-serialization-distribution.env`: Configuration of the pipeline that serialize BAK into Parquet files and distribute them to required locations.
 
 Then, HeifER and Pipelines need to synchronize `linkedServiceName` in the `pipelines.json` file. This is usually OK unless you change it.
-
-Ultimately, libraries in `pipelines.json` need to be updated to match the concrete location in HeifER's `__STORAGE_ACCOUNT_NAME__`. Following the logic:
-```
-abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/...
-```
-where `__CONTAINER_NAME__` is usually equal to `libraries`.
 
 Before deploying libraries, you must build artifacts in the way that is described in the HeifER's main documentation (hint: just run `make artifacts` in the right folder).
 
