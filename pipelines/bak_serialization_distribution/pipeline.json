@@ -1,0 +1,152 @@
+{
+    "name": "BakSerializationDistribution",
+    "properties": {
+        "activities": [
+            {
+                "name": "DeleteTempFolderContent",
+                "type": "DatabricksSparkPython",
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/delete_temp_folder_content.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/bak_serialization_distribution-0.0.2-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "CopyTheLatestZip",
+                "type": "DatabricksSparkPython",
+                "dependsOn": [
+                    {
+                        "activity": "DeleteTempFolderContent",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/latest_zip_file.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/bak_serialization_distribution-0.0.2-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "UnZIP Data",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "CopyTheLatestZip",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "BinarySource",
+                        "storeSettings": {
+                            "type": "AzureBlobStorageReadSettings",
+                            "recursive": true
+                        },
+                        "formatSettings": {
+                            "type": "BinaryReadSettings",
+                            "compressionProperties": {
+                                "type": "ZipDeflateReadSettings"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "AzureBlobStorageWriteSettings",
+                            "copyBehavior": "PreserveHierarchy"
+                        }
+                    },
+                    "enableStaging": false
+                },
+                "inputs": [
+                    {
+                        "referenceName": "zippedbakds",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "unzippedbakds",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "UnloadBakFileToMI",
+                "type": "DatabricksSparkPython",
+                "dependsOn": [
+                    {
+                        "activity": "UnZIP Data",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/unload_bak_to_sql.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/bak_serialization_distribution-0.0.2-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "SerializeAndDistribute",
+                "type": "DatabricksSparkPython",
+                "dependsOn": [
+                    {
+                        "activity": "UnloadBakFileToMI",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "pythonFile": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/serialize_content.py",
+                    "libraries": [
+                        {
+                            "whl": "abfss://__CONTAINER_NAME__@__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net/bak_serialization_distribution/bak_serialization_distribution-0.0.2-py3-none-any.whl"
+                        }
+                    ]
+                },
+                "linkedServiceName": {
+                    "referenceName": "HeiferAdfToCluster",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "parameters": {}
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
